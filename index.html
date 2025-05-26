@@ -1,0 +1,511 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shaurmalab.am</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1c2526, #3c4647);
+            color: #ffffff;
+        }
+        .parallax-bg {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .parallax-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0.5), rgba(0,0,0,0.7));
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.5s ease, background 0.5s ease;
+            background: #4a4a4a;
+            border: 4px solid #666;
+            position: relative;
+            padding: 16px;
+            text-align: center;
+        }
+        .card-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+            background: #5a5a5a;
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(100px) scale(0.8);
+        }
+        .fade-in-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .section-bg {
+            background: url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            position: relative;
+        }
+        .section-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(100, 100, 100, 0.5));
+            mix-blend-mode: overlay;
+        }
+        .glow {
+            text-shadow: 0 0 10px #ffffff, 0 0 15px #b0b0b0;
+        }
+        .animate-bounce {
+            animation: bounce 2.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .success-message {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .success-message.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        img {
+            transition: filter 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .image-container {
+            position: relative;
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+        }
+        .image-container:hover {
+            transform: scale(1.05);
+        }
+        .image-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a596?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80') center/cover;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .image-container:hover::after {
+            opacity: 0;
+        }
+        .image-container:hover img {
+            filter: brightness(1.1);
+            border-color: #ff7518;
+            box-shadow: 0 0 15px #ff7518;
+        }
+        .map-container {
+            position: relative;
+            border: 4px solid #b0b0b0;
+            border-radius: 10px;
+            transition: box-shadow 0.5s ease, border-color 0.5s ease;
+        }
+        .map-container:hover {
+            border-color: #ff7518;
+            box-shadow: 0 0 15px #ff7518;
+        }
+        .spice-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a596?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80') center/cover;
+            opacity: 0.2;
+            animation: float 10s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        @media (max-width: 768px) {
+            img {
+                height: 48px;
+            }
+            h1 {
+                font-size: 2rem;
+                padding: 0 1rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+                padding: 0 1rem;
+            }
+            p, a, button {
+                font-size: 0.875rem;
+                padding: 0 0.5rem;
+            }
+            .card-hover {
+                padding: 8px;
+            }
+            .map-container iframe {
+                height: 16rem;
+            }
+            .grid-cols-1 {
+                grid-template-columns: 1fr;
+            }
+            .flex.overflow-x-auto {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .min-w-[340px] {
+                min-width: 100%;
+                max-width: 18rem;
+            }
+            .text-6xl {
+                font-size: 1.5rem;
+            }
+            .text-4xl {
+                font-size: 1.25rem;
+            }
+            .text-3xl {
+                font-size: 1rem;
+            }
+            .text-2xl {
+                font-size: 0.875rem;
+            }
+            .py-24 {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            .px-6 {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            .px-12 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .px-10 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            .py-4 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+            .py-3 {
+                padding-top: 0.375rem;
+                padding-bottom: 0.375rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center text-center text-white parallax-bg" style="background-image: url('https://media.istockphoto.com/id/1453792067/ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%82%D1%80%D0%B0%D0%B4%D0%B8%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D0%BA%D1%81%D0%B8%D0%BA%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B5-%D1%80%D0%BE%D0%BB%D0%BB%D1%8B-%D0%B1%D1%83%D1%80%D1%80%D0%B8%D1%82%D0%BE-%D1%81-%D0%BC%D1%8F%D1%81%D0%BE%D0%BC-%D0%BE%D0%B2%D0%BE%D1%89%D0%BD%D1%8B%D0%BC-%D1%81%D0%B0%D0%BB%D0%B0%D1%82%D0%BE%D0%BC-%D0%B8-%D0%BA%D0%B0%D1%80%D1%82%D0%BE%D1%84%D0%B5%D0%BB%D0%B5%D0%BC-%D1%84%D1%80%D0%B8-%D0%B1%D0%B5%D0%BB%D1%8B%D0%B9-%D1%84%D0%BE%D0%BD-%D0%B2%D0%B8%D0%B4.jpg?s=612x612&w=0&k=20&c=gK2wDRcJFDNV3BCVFsmT0K2CDY11pw49ws4YgDT1Gjw=')">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/70 to-transparent"></div>
+        <div class="relative z-10 px-6 md:px-12">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-8 glow animate-bounce">Shaurmalab.am - Epic Shawarma Feast</h1>
+            <a href="#contact" class="bg-gradient-to-r from-gray-700 to-[#ff7518] hover:from-gray-800 hover:to-[#ff8c40] text-white font-bold py-4 px-10 rounded-full text-xl transition duration-500 transform hover:scale-115">Order Now!</a>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-24 section-bg relative">
+        <div class="spice-particles"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-6xl font-extrabold text-center text-[#ffffff] mb-20 glow">Our Extravagant Menu</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Menu Item 1 -->
+                <div class="card-hover rounded-xl shadow-2xl fade-in">
+                    <div class="image-container">
+                        <img src="https://media.istockphoto.com/id/1453792067/ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%82%D1%80%D0%B0%D0%B4%D0%B8%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D0%BA%D1%81%D0%B8%D0%BA%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B5-%D1%80%D0%BE%D0%BB%D0%BB%D1%8B-%D0%B1%D1%83%D1%80%D1%80%D0%B8%D1%82%D0%BE-%D1%81-%D0%BC%D1%8F%D1%81%D0%BE%D0%BC-%D0%BE%D0%B2%D0%BE%D1%89%D0%BD%D1%8B%D0%BC-%D1%81%D0%B0%D0%BB%D0%B0%D1%82%D0%BE%D0%BC-%D0%B8-%D0%BA%D0%B0%D1%80%D1%82%D0%BE%D1%84%D0%B5%D0%BB%D0%B5%D0%BC-%D1%84%D1%80%D0%B8-%D0%B1%D0%B5%D0%BB%D1%8B%D0%B9-%D1%84%D0%BE%D0%BD-%D0%B2%D0%B8%D0%B4.jpg?s=612x612&w=0&k=20&c=gK2wDRcJFDNV3BCVFsmT0K2CDY11pw49ws4YgDT1Gjw=" alt="Golden-brown chicken shawarma with tahini dripping over crisp tomatoes, cucumbers, and lettuce, wrapped in a charred pita" class="w-full h-48 md:h-200 object-cover border-b-4 border-[#b0b0b0]">
+                    </div>
+                    <h3 class="text-4xl font-bold text-[#ff7518] mt-4">Classic Shawarma</h3>
+                    <p class="text-gray-300 mt-2 text-base md:text-lg">A flavor explosion of juicy chicken, crisp veggies, and creamy tahini, wrapped in golden pita.</p>
+                    <p class="text-[#fff3cc] font-extrabold mt-4 text-xl md:text-2xl">$8.99</p>
+                </div>
+                <!-- Menu Item 2 -->
+                <div class="card-hover rounded-xl shadow-2xl fade-in">
+                    <div class="image-container">
+                        <img src="https://media.istockphoto.com/id/1453792067/ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%82%D1%80%D0%B0%D0%B4%D0%B8%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D0%BA%D1%81%D0%B8%D0%BA%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B5-%D1%80%D0%BE%D0%BB%D0%BB%D1%8B-%D0%B1%D1%83%D1%80%D1%80%D0%B8%D1%82%D0%BE-%D1%81-%D0%BC%D1%8F%D1%81%D0%BE%D0%BC-%D0%BE%D0%B2%D0%BE%D1%89%D0%BD%D1%8B%D0%BC-%D1%81%D0%B0%D0%BB%D0%B0%D1%82%D0%BE%D0%BC-%D0%B8-%D0%BA%D0%B0%D1%80%D1%82%D0%BE%D1%84%D0%B5%D0%BB%D0%B5%D0%BC-%D1%84%D1%80%D0%B8-%D0%B1%D0%B5%D0%BB%D1%8B%D0%B9-%D1%84%D0%BE%D0%BD-%D0%B2%D0%B8%D0%B4.jpg?s=612x612&w=0&k=20&c=gK2wDRcJFDNV3BCVFsmT0K2CDY11pw49ws4YgDT1Gjw=" alt="Spicy beef shawarma with fiery red sauce, pickled peppers, and onions in a warm, toasted wrap" class="w-full h-48 md:h-200 object-cover border-b-4 border-[#b0b0b0]">
+                    </div>
+                    <h3 class="text-4xl font-bold text-[#ff7518] mt-4">Spicy Shawarma</h3>
+                    <p class="text-gray-300 mt-2 text-base md:text-lg">Blazing beef with pickled peppers and our signature fiery sauce, served in a warm wrap.</p>
+                    <p class="text-[#fff3cc] font-extrabold mt-4 text-xl md:text-2xl">$9.99</p>
+                </div>
+                <!-- Menu Item 3 -->
+                <div class="card-hover rounded-xl shadow-2xl fade-in">
+                    <div class="image-container">
+                        <img src="https://media.istockphoto.com/id/1453792067/ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%82%D1%80%D0%B0%D0%B4%D0%B8%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D0%BA%D1%81%D0%B8%D0%BA%D0%B0%D0%BD%D1%81%D0%BA%D0%B8%D0%B5-%D1%80%D0%BE%D0%BB%D0%BB%D1%8B-%D0%B1%D1%83%D1%80%D1%80%D0%B8%D1%82%D0%BE-%D1%81-%D0%BC%D1%8F%D1%81%D0%BE%D0%BC-%D0%BE%D0%B2%D0%BE%D1%89%D0%BD%D1%8B%D0%BC-%D1%81%D0%B0%D0%BB%D0%B0%D1%82%D0%BE%D0%BC-%D0%B8-%D0%BA%D0%B0%D1%80%D1%82%D0%BE%D1%84%D0%B5%D0%BB%D0%B5%D0%BC-%D1%84%D1%80%D0%B8-%D0%B1%D0%B5%D0%BB%D1%8B%D0%B9-%D1%84%D0%BE%D0%BD-%D0%B2%D0%B8%D0%B4.jpg?s=612x612&w=0&k=20&c=gK2wDRcJFDNV3BCVFsmT0K2CDY11pw49ws4YgDT1Gjw=" alt="Vegetarian shawarma with colorful grilled zucchini, eggplant, and bell peppers, topped with hummus and herbs in soft flatbread" class="w-full h-48 md:h-200 object-cover border-b-4 border-[#b0b0b0]">
+                    </div>
+                    <h3 class="text-4xl font-bold text-[#ff7518] mt-4">Vegetarian Shawarma</h3>
+                    <p class="text-gray-300 mt-2 text-base md:text-lg">A rainbow of grilled veggies, rich hummus, and fresh herbs in soft, golden flatbread.</p>
+                    <p class="text-[#fff3cc] font-extrabold mt-4 text-xl md:text-2xl">$7.99</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-24 section-bg relative">
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-6xl font-extrabold text-center text-[#ffffff] mb-20 glow">Our Legendary Story</h2>
+            <p class="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto text-center">Shaurmalab.am is where Middle Eastern magic meets Yerevan's streets! Our chefs, driven by an insatiable love for shawarma, craft each wrap with explosive spices, fresh-from-the-market ingredients, and pure passion. Step into our vibrant, family-run kitchen and taste the chaos!</p>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 bg-gradient-to-r from-[#1c2526] to-[#3c4647] relative">
+        <div class="spice-particles"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-6xl font-extrabold text-center text-[#ffffff] mb-20 glow">Flavor in Every Frame</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="image-container">
+                    <img src="https://pcpawprint.com/wp-content/uploads/2023/05/pexels-photo-9646845-600x900.jpg" alt="Chefs expertly slicing shawarma from a sizzling rotisserie, surrounded by vibrant spices in a bustling Yerevan kitchen" class="w-full h-48 md:h-72 object-cover rounded-3xl shadow-2xl fade-in border-4 border-[#b0b0b0]">
+                </div>
+                <div class="image-container">
+                    <img src="https://tamingofthespoon.com/wp-content/uploads/2024/02/Chicken-Shawarma-Veggie-Wraps-4-R2.jpg" alt="Close-up of a shawarma wrap with creamy tahini dripping over fresh tomatoes, cucumbers, and golden pita" class="w-full h-48 md:h-72 object-cover rounded-3xl shadow-2xl fade-in border-4 border-[#b0b0b0]">
+                </div>
+                <div class="image-container">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRg43KRW0n6OYjCaADDahMSZ0dWO1yHRyY9fg&s" alt="Vibrant Shaurmalab.am street food stall in Yerevan, glowing with neon lights and busy with customers" class="w-full h-48 md:h-72 object-cover rounded-3xl shadow-2xl fade-in border-4 border-[#b0b0b0]">
+                </div>
+                <div class="image-container">
+                    <img src="https://media.istockphoto.com/id/1151378178/photo/happy-young-girl-enjoying-street-food-in-the-city-in-summer.jpg?s=612x612&w=0&k=20&c=GprdMi8mcGCLlFAxf5qSNf1PBZzrCdgUKs_HxC_ekPg=" alt="Joyful customers savoring shawarma in a cozy, neon-lit Yerevan setting with rustic tables" class="w-full h-48 md:h-72 object-cover rounded-3xl shadow-2xl fade-in border-4 border-[#b0b0b0]">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geolocation Section -->
+    <section id="location" class="py-24 section-bg relative">
+        <div class="spice-particles"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-6xl font-extrabold text-center text-[#ffffff] mb-20 glow">Find Our Flavor Explosion</h2>
+            <div class="w-full h-64 md:h-96 rounded-3xl overflow-hidden shadow-2xl fade-in map-container">
+                <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=44.505%2C40.175%2C44.515%2C40.185&layer=mapnik&marker=40.180%2C44.510" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+            <p class="text-center text-gray-300 text-2xl md:text-3xl mt-8">Visit us at 123 Garni Street, <span class="text-[#ff7518] font-bold">Yerevan</span>, Armenia</p>
+            <p class="text-center text-gray-400 text-base md:text-lg mt-4">Our exact location is coming soon! Contact us for details.</p>
+            <div class="text-center mt-6">
+                <a href="#contact" class="inline-block bg-gradient-to-r from-gray-700 to-[#ff7518] hover:from-gray-800 hover:to-[#ff8c40] text-white font-bold py-3 px-6 md:py-4 md:px-10 rounded-full text-base md:text-xl transition duration-500 transform hover:scale-110">Get in Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-24 bg-gradient-to-r from-[#1c2526] to-[#3c4647]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-6xl font-extrabold text-center text-[#ffffff] mb-20 glow">Raving Fans</h2>
+            <div class="flex overflow-x-auto space-x-10 pb-6">
+                <!-- Testimonial 1 -->
+                <div class="min-w-[340px] bg-[#3d3d3d]/90 rounded-3xl shadow-2xl p-8 fade-in transform hover:scale-110 transition duration-500">
+                    <p class="text-gray-300 text-base md:text-xl">"Shaurmalab.am’s shawarma is a flavor explosion! Best ever!"</p>
+                    <div class="flex items-center mt-6">
+                        <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Customer" class="w-12 md:w-16 h-12 md:h-16 rounded-full mr-4 border-4 border-[#b0b0b0]">
+                        <div>
+                            <p class="font-bold text-[#ff7518] text-xl md:text-2xl">Sarah M.</p>
+                            <p class="text-[#fff3cc] text-base md:text-lg">★★★★★</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="min-w-[340px] bg-[#3d3d3d]/90 rounded-3xl shadow-2xl p-8 fade-in transform hover:scale-110 transition duration-500">
+                    <p class="text-gray-300 text-base md:text-xl">"The spicy shawarma is pure fire! I’m hooked!"</p>
+                    <div class="flex items-center mt-6">
+                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="Customer" class="w-12 md:w-16 h-12 md:h-16 rounded-full mr-4 border-4 border-[#b0b0b0]">
+                        <div>
+                            <p class="font-bold text-[#ff7518] text-xl md:text-2xl">Ahmed K.</p>
+                            <p class="text-[#fff3cc] text-base md:text-lg">★★★★★</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="min-w-[340px] bg-[#3d3d3d]/90 rounded-3xl shadow-2xl p-8 fade-in transform hover:scale-110 transition duration-500">
+                    <p class="text-gray-300 text-base md:text-xl">"Vegetarian shawarma is a masterpiece! So vibrant!"</p>
+                    <div class="flex items-center mt-6">
+                        <img src="https://randomuser.me/api/portraits/women/3.jpg" alt="Customer" class="w-12 md:w-16 h-12 md:h-16 rounded-full mr-4 border-4 border-[#b0b0b0]">
+                        <div>
+                            <p class="font-bold text-[#ff7518] text-xl md:text-2xl">Lilit A.</p>
+                            <p class="text-[#fff3cc] text-base md:text-lg">★★★★★</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 4 -->
+                <div class="min-w-[340px] bg-[#3d3d3d]/90 rounded-3xl shadow-2xl p-8 fade-in transform hover:scale-110 transition duration-500">
+                    <p class="text-gray-300 text-base md:text-xl">"Every bite is a party! Shaurmalab.am rocks!"</p>
+                    <div class="flex items-center mt-6">
+                        <img src="https://randomuser.me/api/portraits/men/4.jpg" alt="Customer" class="w-12 md:w-16 h-12 md:h-16 rounded-full mr-4 border-4 border-[#b0b0b0]">
+                        <div>
+                            <p class="font-bold text-[#ff7518] text-xl md:text-2xl">Vardan S.</p>
+                            <p class="text-[#fff3cc] text-base md:text-lg">★★★★★</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 section-bg relative">
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-6xl font-extrabold text-center text-[#ffffff] mb-20 glow">Join the Flavor Party</h2>
+            <div class="max-w-xl mx-auto">
+                <form id="contact-form" class="space-y-6">
+                    <input type="text" placeholder="Your Name" class="w-full p-4 md:p-6 rounded-3xl border-4 border-[#b0b0b0] bg-[#3d3d3d]/90 focus:outline-none focus:ring-4 focus:ring-[#ff7518] transition duration-500 transform hover:scale-105">
+                    <input type="email" placeholder="Your Email" class="w-full p-4 md:p-6 rounded-3xl border-4 border-[#b0b0b0] bg-[#3d3d3d]/90 focus:outline-none focus:ring-4 focus:ring-[#ff7518] transition duration-500 transform hover:scale-105">
+                    <textarea placeholder="Your Message" class="w-full p-4 md:p-6 rounded-3xl border-4 border-[#b0b0b0] bg-[#3d3d3d]/90 focus:outline-none focus:ring-4 focus:ring-[#ff7518] transition duration-500 transform hover:scale-105" rows="6"></textarea>
+                    <button type="submit" class="w-full bg-gradient-to-r from-gray-700 to-[#ff7518] hover:from-gray-800 hover:to-[#ff8c40] text-white font-extrabold py-3 px-6 md:py-5 md:px-10 rounded-3xl text-base md:text-3xl transition duration-500 transform hover:scale-110">Send Message!</button>
+                </form>
+                <div id="success-message" class="success-message text-center text-[#fff3cc] text-xl md:text-2xl mt-6 hidden">Message Sent! Get Ready for Flavor!</div>
+                <div class="flex justify-center space-x-8 mt-10">
+                    <a href="tel:+37412345678" class="text-[#ffffff] hover:text-[#ff7518] transform hover:scale-125 transition duration-300"><svg class="w-10 md:w-12 h-10 md:h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.53 15.53 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.22 11.67 11.67 0 003.67.59 1 1 0 011 1V20a1 1 0 01-1 1A18 18 0 013 6a1 1 0 011-1h3.38a1 1 0 011 1 11.67 11.67 0 00.59 3.67 1 1 0 01-.22 1.11l-2.2 2.2z"></path></svg></a>
+                    <a href="mailto:info@shaurmalab.am" class="text-[#ffffff] hover:text-[#ff7518] transform hover:scale-125 transition duration-300"><svg class="w-10 md:w-12 h-10 md:h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm-1 3.5l-7 5.5-7-5.5V6l7 5.5L19 6v1.5z"></path></svg></a>
+                    <a href="https://www.glovoapp.com" class="text-[#ffffff] hover:text-[#ff7518] transform hover:scale-125 transition duration-300"><svg class="w-10 md:w-12 h-10 md:h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h3l-4 4-4-4h3V7z"></path></svg></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Dramatic fade-in animations
+        gsap.utils.toArray(".fade-in").forEach(element => {
+            gsap.fromTo(element, 
+                { opacity: 0, y: 100, scale: 0.8 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 1.2,
+                    scrollTrigger: {
+                        trigger: element,
+                        start: "top 85%",
+                        end: "top 50%",
+                        scrub: true
+                    }
+                }
+            );
+        });
+
+        // Enhanced parallax effect
+        gsap.to(".parallax-bg", {
+            backgroundPosition: "50% 200px",
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".parallax-bg",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Contact form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const successMessage = document.getElementById('success-message');
+            successMessage.classList.remove('hidden');
+            successMessage.classList.add('show');
+            this.reset();
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+                successMessage.classList.add('hidden');
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
